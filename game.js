@@ -151,31 +151,135 @@ function LegalMoves(state) {
     return moves;
 }
 
-// Drop Phase test
-const dropInput = "B 0 0 0 0 0 0 0 0 0 0";
-const dropState = parseState(dropInput);
+function FourLineWin(pieces) {
 
-// Slide Phase test
-const slideInput = "B 1 2 3 4 5 7 8 9 10 11";
-const slideState = parseState(slideInput);
+    const pieceSet = new Set(pieces.filter(pos => pos !== 0));
+
+    const directions = [
+        { row: 0, col: 1 },  // Horizontal
+        { row: 1, col: 0 },  // Vertical
+        { row: 1, col: 1 },  // Diagonal Down-Right
+        { row: 1, col: -1 }  // Diagonal Down-Left
+    ];
+
+    for (const position of pieceSet) {
+
+        const { row, col } = positionToRowCol(position);
+
+        for (const direction of directions) {
+            
+
+            let count = 1;
+            let newRow = row;
+            let newCol = col;
+
+            for (let i = 0; i < 3; i++) {
+                newRow += direction.row;
+                newCol += direction.col;
+
+                if (!ValidatePosition(newRow, newCol)) {
+                    break;
+                }
+
+                const newPosition = rowColToPosition(newRow, newCol);
+
+                if (pieceSet.has(newPosition)) {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+
+            if (count === 4) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
 
 
-// Display states
-console.log("Drop state object:");
-console.log(dropState);
+function FourSquareWins(pieces) {
 
-console.log("Slide state object:");
-console.log(slideState);
+    const pieceSet = new Set(pieces.filter(pos => pos !== 0));
+
+    for (const position of pieceSet) {
+
+        const { row, col } = positionToRowCol(position);
+
+        const squarePositions = [
+            rowColToPosition(row, col),
+            rowColToPosition(row, col + 1),
+            rowColToPosition(row + 1, col),
+            rowColToPosition(row + 1, col + 1)
+        ];
+
+        if (squarePositions.every(pos => pieceSet.has(pos))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function TiltedSquareWins(pieces) {
+
+    const pieceSet = new Set(pieces.filter(pos => pos !== 0));
+
+    for (let row =1; row < 5; row++) {
+        for (let col = 1; col < 5; col++) {
+            
+            const squarePositions = [
+                rowColToPosition(row - 1, col), // Top
+                rowColToPosition(row, col + 1), // Right
+                rowColToPosition(row + 1, col), // Bottom
+                rowColToPosition(row, col - 1) // Left
+            ];
+
+            if (squarePositions.every(pos => pieceSet.has(pos))) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
 
 
-// Check phases
-console.log("Drop state:", DropPhase(dropState));
-console.log("Slide state:", DropPhase(slideState));
+function CheckWins(pieces) {
+
+    if (FourLineWin(pieces)) {
+        return true;
+    }
+
+    if (FourSquareWins(pieces)) {
+        return true;
+    }
+
+    if (TiltedSquareWins(pieces)) {
+        return true;
+    }
+
+    return false;
+}
 
 
-// Check legal moves
-console.log("Legal moves for drop state:");
-console.log(LegalMoves(dropState));
+console.log("Horizontal Wins: ", FourLineWin([1, 2, 3, 4, 20]));
 
-console.log("Legal moves for slide state:");
-console.log(LegalMoves(slideState));
+console.log("Vertical Wins: ", FourLineWin([1, 7, 13, 19, 30]));
+
+console.log("Diagonal Wins: ", FourLineWin([1, 8, 15, 22, 30]));
+
+console.log("Square Wins: ", FourSquareWins([1, 2, 7, 8, 20]));
+
+console.log("No Wins: ", FourLineWin([1, 3, 8, 20, 35]));
+
+console.log("Tilted Square Wins: ", TiltedSquareWins([2, 7, 9, 14, 30]));
+
+console.log("No tilted square Wins: ", TiltedSquareWins([1, 5, 12, 20, 30]));
+
+console.log("Check Wins (Four Line): ", CheckWins([1, 2, 3, 4, 20]));
+console.log("Check Wins (Four Square): ", CheckWins([1, 2, 7, 8, 20]));
+console.log("Check Wins (Tilted Square): ", CheckWins([2, 7, 9, 14, 30]));
+console.log("Check Wins (No Wins): ", CheckWins([1, 5, 12, 20, 30]));
