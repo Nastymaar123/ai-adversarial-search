@@ -302,11 +302,15 @@ function ApplyMove(state, move) {
     return newState;
 }
 
+function StateKey(state) {
 
-const dropTestMove = parseState("B 0 0 0 0 0 0 0 0 0 0");
+    const black = [...state.blackPieces].sort((a, b) => a - b).join(',');
 
-console.log("Apply Drop:", ApplyMove(dropTestMove, [0, 5]));
+    const red = [...state.redPieces].sort((a, b) => a - b).join(',');
 
-const slideTestMove = parseState("B 1 2 3 4 5 7 8 9 10 11");
+    return `${state.player}|${black}|${red}`;
+}
 
-console.log("Apply Slide:", ApplyMove(slideTestMove, [5, 6]));
+const stateKeyTest = parseState("B 5 2 1 4 3 11 9 7 10 8");
+
+console.log(StateKey(stateKeyTest));
