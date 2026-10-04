@@ -265,21 +265,48 @@ function CheckWins(pieces) {
 }
 
 
-console.log("Horizontal Wins: ", FourLineWin([1, 2, 3, 4, 20]));
+function ApplyMove(state, move) {
 
-console.log("Vertical Wins: ", FourLineWin([1, 7, 13, 19, 30]));
+    const from = move[0];
+    const to = move[1];
 
-console.log("Diagonal Wins: ", FourLineWin([1, 8, 15, 22, 30]));
+    const newState = {
+        
+        player: state.player,
+        blackPieces: [...state.blackPieces],
+        redPieces: [...state.redPieces]
 
-console.log("Square Wins: ", FourSquareWins([1, 2, 7, 8, 20]));
+    };
 
-console.log("No Wins: ", FourLineWin([1, 3, 8, 20, 35]));
+    const pieces = newState.player === 'B' ? newState.blackPieces : newState.redPieces;
 
-console.log("Tilted Square Wins: ", TiltedSquareWins([2, 7, 9, 14, 30]));
+    if (from === 0) {
 
-console.log("No tilted square Wins: ", TiltedSquareWins([1, 5, 12, 20, 30]));
+        const fromIndex = pieces.indexOf(from);
+        if (fromIndex !== -1) {
+            pieces[fromIndex] = to;
+        }
+    }
 
-console.log("Check Wins (Four Line): ", CheckWins([1, 2, 3, 4, 20]));
-console.log("Check Wins (Four Square): ", CheckWins([1, 2, 7, 8, 20]));
-console.log("Check Wins (Tilted Square): ", CheckWins([2, 7, 9, 14, 30]));
-console.log("Check Wins (No Wins): ", CheckWins([1, 5, 12, 20, 30]));
+    else {
+        const fromIndex = pieces.indexOf(from);
+        if (fromIndex !== -1) {
+            pieces[fromIndex] = to;
+        }
+    }
+
+    pieces.sort((a, b) => a - b);
+
+    newState.player = newState.player === 'B' ? 'R' : 'B';
+
+    return newState;
+}
+
+
+const dropTestMove = parseState("B 0 0 0 0 0 0 0 0 0 0");
+
+console.log("Apply Drop:", ApplyMove(dropTestMove, [0, 5]));
+
+const slideTestMove = parseState("B 1 2 3 4 5 7 8 9 10 11");
+
+console.log("Apply Slide:", ApplyMove(slideTestMove, [5, 6]));
