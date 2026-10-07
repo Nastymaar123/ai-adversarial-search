@@ -311,6 +311,12 @@ function StateKey(state) {
     return `${state.player}|${black}|${red}`;
 }
 
-const stateKeyTest = parseState("B 5 2 1 4 3 11 9 7 10 8");
 
-console.log(StateKey(stateKeyTest));
+module.exports = {
+    parseState,
+    LegalMoves,
+    ApplyMove,
+    CheckWins,
+    StateKey
+    
+};
