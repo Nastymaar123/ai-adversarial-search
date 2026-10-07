@@ -213,10 +213,98 @@ function BestMinimaxMove(state, MaxDepth) {
 
 }
 
+function AlphaBeta(state, depth, MaxDepth, alpha, beta, maximizingPlayer) {
+
+    if (depth >= MaxDepth) {
+        return Evaluate(state);
+    }
+
+    if (CheckWins(state.blackPieces) || CheckWins(state.redPieces)) {
+        return Evaluate(state);
+    }
+
+    const moves = LegalMoves(state);
+    
+    if (moves.length === 0) {
+        return Evaluate(state);
+    }
+
+    if (maximizingPlayer) {
+        
+        let bestScore = -Infinity;
+        
+        for (const move of moves) {
+            const newState = ApplyMove(state, move);
+            const score = AlphaBeta(newState, depth + 1, MaxDepth, alpha, beta, false);
+            bestScore = Math.max(bestScore, score);
+            alpha = Math.max(alpha, bestScore);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return bestScore;
+    
+    } else {
+        let bestScore = Infinity;
+        for (const move of moves) {
+            const newState = ApplyMove(state, move);
+            const score = AlphaBeta(newState, depth + 1, MaxDepth, alpha, beta, true);
+            bestScore = Math.min(bestScore, score);
+            beta = Math.min(beta, bestScore);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return bestScore;
+    }
+
+
+}
+
+function BestAlphaBetaMove(state, MaxDepth) {
+    const moves = LegalMoves(state);
+
+    if (moves.length === 0) {
+        return null;
+    }
+
+    let bestMove = moves[0];
+    let bestScore = state.player === 'B' ? -Infinity : Infinity;
+
+    let alpha = -Infinity;
+    let beta = Infinity;
+
+    for (const move of moves) {
+        
+        const newState = ApplyMove(state, move);
+        const score = AlphaBeta(newState, 1, MaxDepth, alpha, beta, state.player === 'B');
+        
+        if (state.player === 'B') {
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+       alpha = Math.max(alpha, bestScore);
+        
+    } else {
+            if (score < bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+            
+            beta = Math.min(beta, bestScore);
+        }
+    }
+    
+    return bestMove;
+}
 
 const testState = parseState("B 1 3 12 20 35 5 8 17 29 34");
+console.log("Best AlphaBeta Move:", BestAlphaBetaMove(testState, 2));
 
-console.log("Best Minimax Move:", BestMinimaxMove(testState, 2));
+console.log("Minimax Best Move:", BestMinimaxMove(testState, 2));
+
+
 
 
 module.exports = {
