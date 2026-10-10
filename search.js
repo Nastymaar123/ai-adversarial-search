@@ -15,6 +15,18 @@ Purpose: implements the adversarial search algorithms for the game, including mi
 
 
 const { parseState, LegalMoves, ApplyMove, CheckWins, StateKey } = require("./game");
+const readline = require("readline");
+
+let nodesEvaluated = 0;
+let maxDepthReached = 0;
+let moveScore = 0;
+
+
+function ResetSearchMetrics() {
+    nodesEvaluated = 0;
+    maxDepthReached = 0;
+    moveScore = 0;
+}
 
 function ShapePotential(pieces) {
 
@@ -110,6 +122,8 @@ function ForkPotential(pieces) {
 
 function Evaluate(state) {
 
+    nodesEvaluated++;
+
     if (CheckWins(state.blackPieces)) {
         return 10000; // Black wins
     }
@@ -145,7 +159,12 @@ function Evaluate(state) {
 
 function Minimax(state, depth, MaxDepth, maximizingPlayer) {
 
+    maxDepthReached = Math.max(maxDepthReached, depth);
+    
     if (depth >= MaxDepth) {
+        if (depth > maxDepthReached) {
+            maxDepthReached = depth;
+        }
         return Evaluate(state);
     }
 
@@ -194,7 +213,7 @@ function BestMinimaxMove(state, MaxDepth) {
 
     for (const move of moves) {
         const newState = ApplyMove(state, move);
-        const score = Minimax(newState, 1, MaxDepth, state.player === 'B');
+        const score = Minimax(newState, 1, MaxDepth, newState.player === 'B');
         
         if (state.player === 'B') {
             if (score > bestScore) {
@@ -208,12 +227,15 @@ function BestMinimaxMove(state, MaxDepth) {
             }
         }
     }
-    
+    moveScore = bestScore;
+
     return bestMove;
 
 }
 
 function AlphaBeta(state, depth, MaxDepth, alpha, beta, maximizingPlayer) {
+
+    maxDepthReached = Math.max(maxDepthReached, depth);
 
     if (depth >= MaxDepth) {
         return Evaluate(state);
@@ -277,7 +299,7 @@ function BestAlphaBetaMove(state, MaxDepth) {
     for (const move of moves) {
         
         const newState = ApplyMove(state, move);
-        const score = AlphaBeta(newState, 1, MaxDepth, alpha, beta, state.player === 'B');
+        const score = AlphaBeta(newState, 1, MaxDepth, alpha, beta, newState.player === 'B');
         
         if (state.player === 'B') {
             if (score > bestScore) {
@@ -295,17 +317,56 @@ function BestAlphaBetaMove(state, MaxDepth) {
             beta = Math.min(beta, bestScore);
         }
     }
+    moveScore = bestScore;
     
     return bestMove;
 }
 
-const testState = parseState("B 1 3 12 20 35 5 8 17 29 34");
-console.log("Best AlphaBeta Move:", BestAlphaBetaMove(testState, 2));
-
-console.log("Minimax Best Move:", BestMinimaxMove(testState, 2));
+function main() {
 
 
+    const algorithm = process.argv[2];
+    const depth = Number(process.argv[3]);
 
+if (
+
+        (algorithm !== 'minimax' && algorithm !== 'alphabeta') || !Number.isInteger(depth) || depth < 1
+    ) {
+        console.error("Usage: node search.js <minimax|alphabeta> <depth>");
+        process.exit(1);
+    }
+
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.on("line", function(input) {
+        // Handle input here
+
+        if (input.trim() === "") {
+            return;
+        }
+
+        const state = parseState(input);
+
+        ResetSearchMetrics();
+        let bestMove;
+        if (algorithm === 'minimax') {
+            bestMove = BestMinimaxMove(state, depth);
+        } else if (algorithm === 'alphabeta') {
+            bestMove = BestAlphaBetaMove(state, depth);
+        }
+        
+        if (bestMove !== null) {
+            process.stdout.write(`${bestMove[0]} ${bestMove[1]}\n`);
+        }
+
+        process.stderr.write(`${algorithm},${nodesEvaluated},${maxDepthReached},${moveScore}\n`);
+    });
+
+}
+main();
 
 module.exports = {
     parseState,
