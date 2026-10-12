@@ -8,12 +8,29 @@ Professor: Dr. Schwesinger
 Assignment: Project 3 - Adversarial Search
 File: game.js
 Purpose: handles the game state, board representation, legal moves and winning conditions for the adversarial search game.
+
+Citations:
+
+Author: OpenAI
+Title: ChatGPT
+Retrieved October 03, 2026 from https://chatgpt.com/
+Note: Used for assistance with debugging, and selected portions of certain code implementations.
+
+Author: Mozilla Developer Network
+Title: "Array.sort() - JavaScript."
+Retrieved October 03, 2026 from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+Note: Used for reference to sort the pieces in the game state.
+
+
 */
 
 'use strict';
-
+//Function: parseState
+//Parses the input string into the game state representation
+// Parameters:
+// - input: The input string representing the game state
+// Returns: An object containing the current player, black pieces, and red pieces
 function parseState(input) {
-    // Implement the logic to parse the input string into the game state representation
 
 const parts = input.trim().split(/\s+/);
 
@@ -34,6 +51,11 @@ return {
 
 }
 
+//Function: positionToRowCol
+//Converts a board position to its corresponding row and column
+// Parameters:
+// - position: The board position (1-36)
+// Returns: An object containing the row and column indices (0-5)
 function positionToRowCol(position) {
    
     const index = position - 1; 
@@ -44,15 +66,32 @@ function positionToRowCol(position) {
 }
 
 
+//Function: rowColToPosition
+//Converts row and column indices to the corresponding board position
+// Parameters:
+// - row: The row index (0-5)
+// - col: The column index (0-5)
+// Returns: The board position (1-36)
 function rowColToPosition(row, col) {
     return row * 6 + col + 1;
 }
 
+//Function: ValidatePosition
+//Checks if the given row and column indices are within the valid board range
+// Parameters:
+// - row: The row index (0-5)
+// - col: The column index (0-5)
+// Returns: True if the position is valid, false otherwise
 function ValidatePosition(row, col) {
     return row >= 0 && row < 6 && col >= 0 && col < 6;
 }
 
 
+//Function: OccupiedPosition
+//Returns a set of all occupied positions on the board
+// Parameters:
+// - state: The current game state
+// Returns: A set containing all occupied positions
 function OccupiedPosition(state) {
  
     const occupied = new Set();
@@ -72,6 +111,11 @@ function OccupiedPosition(state) {
     return occupied;
 }
 
+//Function: DropPhase
+//Checks if the game is in the drop phase
+// Parameters:
+// - state: The current game state
+// Returns: True if the game is in the drop phase, false otherwise
 function DropPhase(state) {
 
     if (state.blackPieces.includes(0)) {
@@ -84,6 +128,11 @@ function DropPhase(state) {
     return false;
 }
 
+//Function: LegalMoves
+//Generates all legal moves for the current player in the given game state
+// Parameters:
+// - state: The current game state
+// Returns: An array of legal moves, where each move is represented as [fromPosition, toPosition]
 function LegalMoves(state) {
 
     const moves = [];
@@ -151,6 +200,11 @@ function LegalMoves(state) {
     return moves;
 }
 
+//Function: FourLineWin
+//Checks if the given set of pieces contains a four-in-a-line
+// Parameters:
+// - pieces: An array of positions occupied by the player's pieces
+// Returns: True if there is a four-in-a-line, false otherwise
 function FourLineWin(pieces) {
 
     const pieceSet = new Set(pieces.filter(pos => pos !== 0));
@@ -199,7 +253,11 @@ function FourLineWin(pieces) {
     return false;
 }
 
-
+//Function: FourSquareWins
+//Checks if the given set of pieces contains a four-in-a-square
+// Parameters:
+// - pieces: An array of positions occupied by the player's pieces
+// Returns: True if there is a four-in-a-square, false otherwise
 function FourSquareWins(pieces) {
 
     const pieceSet = new Set(pieces.filter(pos => pos !== 0));
@@ -223,6 +281,11 @@ function FourSquareWins(pieces) {
     return false;
 }
 
+//Function: TiltedSquareWins
+//Checks if the given set of pieces contains a tilted four-in-a-square
+// Parameters:
+// - pieces: An array of positions occupied by the player's pieces
+// Returns: True if there is a tilted four-in-a-square, false otherwise
 function TiltedSquareWins(pieces) {
 
     const pieceSet = new Set(pieces.filter(pos => pos !== 0));
@@ -246,7 +309,11 @@ function TiltedSquareWins(pieces) {
     return false;
 }
 
-
+//Function: CheckWins
+//Checks if the given set of pieces contains any winning configuration (four-in-a-line, four-in-a-square, or tilted four-in-a-square)
+// Parameters:
+// - pieces: An array of positions occupied by the player's pieces
+// Returns: True if there is any winning configuration, false otherwise
 function CheckWins(pieces) {
 
     if (FourLineWin(pieces)) {
@@ -264,6 +331,12 @@ function CheckWins(pieces) {
     return false;
 }
 
+//Function: ApplyMove
+//Applies a move to the given game state and returns the resulting new state
+// Parameters:
+// - state: The current game state
+// - move: The move to apply, represented as [fromPosition, toPosition]
+// Returns: The new game state after applying the move
 
 function ApplyMove(state, move) {
 
@@ -301,6 +374,12 @@ function ApplyMove(state, move) {
 
     return newState;
 }
+
+//Function: StateKey
+//Generates a unique key representing the current game state
+// Parameters:
+// - state: The current game state
+// Returns: A string key representing the game state
 
 function StateKey(state) {
 
