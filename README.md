@@ -11,6 +11,30 @@ Maar Drew-Joseph
 - Created: 10/03/2026
 - Due Date: 10/12/2026
 
+## Project Overview
+
+This project implements adversarial search algorithms for a
+two-player strategy game played on a 6×6 board.
+
+The application uses JavaScript and Node.js to evaluate game
+states and select optimal moves using two algorithms:
+
+- Minimax
+- Alpha-Beta Pruning
+
+The game includes two phases: placing pieces on the board
+and moving pieces between adjacent positions.
+
+A heuristic evaluation function considers center control,
+piece positioning, and potential winning formations.
+
+The project also includes automated benchmarking to compare
+both algorithms across different game states and search depths.
+
+In the recorded depth-3 benchmarks, Alpha-Beta Pruning
+reduced the number of evaluated nodes by approximately
+78%–85% compared with standard Minimax.
+
 ## How to Run
 
 this project uses JavaScript and Node.js for the implementation of the Minimax and Alpha-Beta Pruning for the borad game.
